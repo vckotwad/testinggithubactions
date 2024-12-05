@@ -3,6 +3,8 @@ on: workflow_dispatch
 jobs:  
   first-job: 
     runs-on: ubuntu-latest
+    container:
+      image: node
     steps: 
       - name: Print greeting
         run: |
