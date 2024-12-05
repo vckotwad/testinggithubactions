@@ -8,7 +8,7 @@ jobs:
       image: node
     env: 
       MONGODB_CONNECTION_PROTOCOL: mongodb
-      MONGODB_CLUSTER_ADDRESS: localhost
+      MONGODB_CLUSTER_ADDRESS: mongodb
       MONGODB_USERNAME: root
       MONGODB_PASSWORD: password
     services:
@@ -25,12 +25,12 @@ jobs:
           echo "hello world"
           echo "this is multiline testing"
           
-      - name: Install MongoDB Shell
+      - name: Install MongoDB Shell and Netcat
         run: |
           curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-keyring.gpg
           echo "deb [signed-by=/usr/share/keyrings/mongodb-keyring.gpg] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
           apt-get update
-          apt-get install -y mongodb-mongosh netcat
+          apt-get install -y mongodb-mongosh netcat-openbsd
           
       - name: Wait for MongoDB to be ready
         run: |
