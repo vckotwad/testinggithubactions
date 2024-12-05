@@ -8,12 +8,14 @@ jobs:
       image: node
     env: 
       MONGODB_CONNECTION_PROTOCOL: mongodb
-      MONGODB_CLUSTER_ADDRESS: mongodb
+      MONGODB_CLUSTER_ADDRESS: localhost
       MONGODB_USERNAME: root
       MONGODB_PASSWORD: password
     services:
       mongodb:
         image: mongo
+        ports:
+          - 27017:27017
         env: 
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: password 
@@ -28,11 +30,21 @@ jobs:
           curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-keyring.gpg
           echo "deb [signed-by=/usr/share/keyrings/mongodb-keyring.gpg] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
           apt-get update
-          apt-get install -y mongodb-mongosh
+          apt-get install -y mongodb-mongosh netcat
+          
+      - name: Wait for MongoDB to be ready
+        run: |
+          echo "Waiting for MongoDB to start..."
+          for i in {1..10}; do
+            nc -z localhost 27017 && echo "MongoDB is ready!" && exit 0
+            echo "Retrying ($i)..."
+            sleep 5
+          done
+          echo "MongoDB did not start in time!" && exit 1
           
       - name: Create a collection and list collections
         run: |
-          echo 'use("my_database"); db.my_collection.insertOne({"key": "value"}); printjson(db.getCollectionNames());' | mongosh "${{ env.MONGODB_CLUSTER_ADDRESS }}"
+          echo 'use("my_database"); db.my_collection.insertOne({"key": "value"}); printjson(db.getCollectionNames());' | mongosh "mongodb://root:password@localhost:27017"
           
       - name: Print Goodbye
         run: echo "Done - bye"
