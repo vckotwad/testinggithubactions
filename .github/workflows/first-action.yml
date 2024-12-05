@@ -25,14 +25,16 @@ jobs:
           echo "hello world"
           echo "this is multiline testing"
           
-      - name: Install MongoDB Client
+      - name: Install MongoDB Shell
         run: |
+          curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/mongodb-keyring.gpg] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
           apt-get update
-          apt-get install -y mongodb-clients
+          apt-get install -y mongodb-mongosh
           
       - name: Create a collection and list collections
         run: |
-          echo 'use my_database; db.my_collection.insertOne({"key": "value"}); db.getCollectionNames();' | mongo ${{ env.MONGODB_CLUSTER_ADDRESS }}
+          echo 'use("my_database"); db.my_collection.insertOne({"key": "value"}); printjson(db.getCollectionNames());' | mongosh "${{ env.MONGODB_CLUSTER_ADDRESS }}"
           
       - name: Print Goodbye
         run: echo "Done - bye"
