@@ -8,6 +8,9 @@ jobs:
     services:
       mongodb:
         image: mongo
+        env: 
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password 
     steps: 
       - name: Print greeting
         run: |
