@@ -1,5 +1,6 @@
 name: first workflow
 on: workflow_dispatch
+
 jobs:  
   first-job: 
     runs-on: ubuntu-latest
@@ -7,12 +8,14 @@ jobs:
       image: node
     env: 
       MONGODB_CONNECTION_PROTOCOL: mongodb
-      MONGODB_CLUSTER_ADDRESS:  mongodb
+      MONGODB_CLUSTER_ADDRESS: mongodb
       MONGODB_USERNAME: root
       MONGODB_PASSWORD: password
     services:
       mongodb:
         image: mongo
+        ports:
+          - 27017:27017
         env: 
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: password 
@@ -21,7 +24,15 @@ jobs:
         run: |
           echo "hello world"
           echo "this is multiline testing"
+          
+      - name: Install MongoDB Client
+        run: |
+          apt-get update
+          apt-get install -y mongodb-clients
+          
+      - name: Create a collection and list collections
+        run: |
+          echo 'use my_database; db.my_collection.insertOne({"key": "value"}); db.getCollectionNames();' | mongo ${{ env.MONGODB_CLUSTER_ADDRESS }}
+          
       - name: Print Goodbye
         run: echo "Done - bye"
-        
-      
