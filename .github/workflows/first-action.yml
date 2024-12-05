@@ -5,6 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node
+    services:
+      mongodb:
+        image: mongo
     steps: 
       - name: Print greeting
         run: |
